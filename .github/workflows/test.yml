@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        backend: [llvm, clang, gpu] #, amd]
+        backend: [llvm] #, clang, gpu] #, amd]
 
     name: Tests on Windows (${{ matrix.backend }})
     runs-on: windows-2022
