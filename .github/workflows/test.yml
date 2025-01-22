@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.Python3_ROOT_DIR }}\Lib\site-packages
-          key: ${{ matrix.backend }}-packages-${{ hashFiles('**/setup.py') }}
+          key: windows-${{ matrix.backend }}-packages-${{ hashFiles('**/setup.py') }}
       - name: Cache downloads
         uses: actions/cache@v4
         with:
