@@ -164,7 +164,7 @@ class Profiling(contextlib.ContextDecorator):
 
 # *** universal database cache ***
 
-cache_dir: str = os.path.join(getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
+cache_dir: str = os.path.join(os.getenv("LOCALAPPDATA", os.path.expanduser("~")) if WIN else os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
 CACHEDB: str = getenv("CACHEDB", os.path.abspath(os.path.join(cache_dir, "cache.db")))
 CACHELEVEL = getenv("CACHELEVEL", 2)
 
