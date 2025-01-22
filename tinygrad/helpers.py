@@ -164,7 +164,7 @@ class Profiling(contextlib.ContextDecorator):
 
 # *** universal database cache ***
 
-cache_dir: str = "D:\a\wincachetest\tinygrad"
+cache_dir: str = r"D:\a\wincachetest\tinygrad"
 CACHEDB: str = getenv("CACHEDB", os.path.abspath(os.path.join(cache_dir, "cache.db")))
 CACHELEVEL = getenv("CACHELEVEL", 2)
 
