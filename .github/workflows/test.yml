@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        backend: [clang] #, llvm, gpu] #, amd]
+        backend: [llvm] #, clang, gpu] #, amd]
     name: Tests on Windows (${{ matrix.backend }})
     runs-on: windows-2022
     timeout-minutes: 45
@@ -46,9 +46,7 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[testing$(if ('${{ matrix.backend }}' -eq 'llvm') {',llvm'})]" --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
       - name: Check Device.DEFAULT and print some source
-        run: | # TODO; remove prints
-          python -c "import platform; print(platform.system())"
-          python -c "import os; print(os.name().sysname)"
+        run: |
           $env:PYTHONPATH = "${{ github.workspace }}"; python -c "from tinygrad import Device; assert Device.DEFAULT in ['LLVM','CLANG','CUDA','GPU','AMD','NV'], Device.DEFAULT"
           $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
       - name: Run pytest (not cuda or amd)
