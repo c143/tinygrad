@@ -241,11 +241,9 @@ def _ensure_downloads_dir() -> pathlib.Path:
 def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional[str]=None, gunzip:bool=False,
           allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
     if url.startswith(("/", ".")): return pathlib.Path(url)
-    #fp = pathlib.Path()
     name_part = name or hashlib.md5(url.encode('utf-8')).hexdigest()
     _ensure_downloads_dir().mkdir(parents=True, exist_ok=True)
     fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name_part + (f".gunzip" if gunzip else ""))
-    
     if not fp.is_file() or not allow_caching:
         # Create directory if needed
         parent_dir = fp.parent
@@ -253,21 +251,13 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
         if fp.is_file(): fp.unlink()
         with urllib.request.urlopen(url, timeout=10) as r:
             assert r.status == 200, f"HTTP status code: {r.status}"
-            
             content_length = int(r.headers.get('content-length', 0)) if not gunzip else None
             readfile = gzip.GzipFile(fileobj=r) if gunzip else r
-            
             progress_bar = tqdm(total=content_length, unit='B', unit_scale=True, desc=f"{url}", disable=WIN)
-            
             with tempfile.NamedTemporaryFile(dir=parent_dir, delete=False) as f:
-                while chunk := readfile.read(16384):
-                    progress_bar.update(f.write(chunk))
-            
+                while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
             fp = pathlib.Path(f.name).replace(fp)
-        
-        if content_length and os.path.getsize(fp) < content_length:
-            raise RuntimeError(f"Download incomplete: {fp.size} < {content_length}")
-    
+        if content_length and os.path.getsize(fp) < content_length: raise RuntimeError(f"Download incomplete: {fp.size} < {content_length}")
     return fp
 
 # *** Exec helpers
