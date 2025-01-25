@@ -241,9 +241,9 @@ def _ensure_downloads_dir() -> pathlib.Path:
 def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional[str]=None, gunzip:bool=False,
           allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
   if url.startswith(("/", ".")): return pathlib.Path(url)
+  name_part = name or hashlib.md5(url.encode('utf-8')).hexdigest()
   _ensure_downloads_dir().mkdir(parents=True, exist_ok=True)
-  if name is not None and (isinstance(name, pathlib.Path) or '/' in name): fp = pathlib.Path(name)
-  else: fp = _ensure_downloads_dir() / (subdir if subdir is not None else "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
+  fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name_part + (".gunzip" if gunzip else ""))
   if not fp.is_file() or not allow_caching:
     _dir = fp.parent
     if not _dir.exists(): _dir.mkdir(parents=True, exist_ok=True)
