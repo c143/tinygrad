@@ -241,9 +241,9 @@ def _ensure_downloads_dir() -> pathlib.Path:
 def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional[str]=None, gunzip:bool=False,
           allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
   if url.startswith(("/", ".")): return pathlib.Path(url)
-  name_part = name or hashlib.md5(url.encode('utf-8')).hexdigest()
-  _ensure_downloads_dir().mkdir(parents=True, exist_ok=True)
-  fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name_part / (".gunzip" if gunzip else ""))
+  _ensure_downloads_dir().mkdir(parents=True, exist_ok=True) # TODO: needed?
+  if name is not None and (isinstance(name, pathlib.Path) or '/' in name): fp = pathlib.Path(name)
+  else: fp = _ensure_downloads_dir() / (subdir or "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
   if not fp.is_file() or not allow_caching:
     _dir = fp.parent
     if not _dir.exists(): _dir.mkdir(parents=True, exist_ok=True)
@@ -255,8 +255,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
       with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
         while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
-      #fp = pathlib.Path(f.name).replace(fp) #TODO: required?
-      pathlib.Path(f.name).replace(fp)
+      fp = pathlib.Path(f.name).replace(fp)
       if length and (file_size:=os.path.getsize(fp)) < length: raise RuntimeError(f"fetch size incomplete: {file_size} < {length}")
   return fp
 
