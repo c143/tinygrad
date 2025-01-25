@@ -164,7 +164,7 @@ class Profiling(contextlib.ContextDecorator):
 
 # *** universal database cache ***
 
-cache_dir: str = os.path.join(os.getenv("LOCALAPPDATA", os.path.expanduser("~")) if WIN else os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
+cache_dir: str = os.path.join(getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
 CACHEDB: str = getenv("CACHEDB", os.path.abspath(os.path.join(cache_dir, "cache.db")))
 CACHELEVEL = getenv("CACHELEVEL", 2)
 
@@ -245,11 +245,10 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
   _ensure_downloads_dir().mkdir(parents=True, exist_ok=True)
   fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name_part + (".gunzip" if gunzip else ""))
   if not fp.is_file() or not allow_caching:
-    _dir = fp.parent
-    if not _dir.exists(): _dir.mkdir(parents=True, exist_ok=True)
-    if fp.is_file(): fp.unlink()
+    (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
+    #if fp.is_file(): fp.unlink()
     with urllib.request.urlopen(url, timeout=10) as r:
-      assert r.status == 200, f"HTTP status code: {r.status}"
+      assert r.status == 200, r.status
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
       readfile = gzip.GzipFile(fileobj=r) if gunzip else r
       progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
