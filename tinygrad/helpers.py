@@ -238,18 +238,13 @@ def _ensure_downloads_dir() -> pathlib.Path:
     return downloads_dir
   return pathlib.Path(cache_dir) / "downloads"
 
-def fetch(url: str, name: Optional[Union[pathlib.Path, str]] = None, subdir: Optional[str] = None, gunzip: bool = False, allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
-    if url.startswith(("/", ".")):
-        return pathlib.Path(url)
-    
-    fp = pathlib.Path()
+def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional[str]=None, gunzip:bool=False,
+          allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
+    if url.startswith(("/", ".")): return pathlib.Path(url)
+    #fp = pathlib.Path()
     name_part = name or hashlib.md5(url.encode('utf-8')).hexdigest()
-    if name is not None and (isinstance(name, pathlib.Path) or name.find('\\') != -1):
-        # Use Windows-style path separator
-        fp = pathlib.Path(str(name).replace('/', '\\'))
-    else:
-        _ensure_downloads_dir().mkdir(parents=True, exist_ok=True)
-        fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name_part + (f".gunzip" if gunzip else ""))
+    _ensure_downloads_dir().mkdir(parents=True, exist_ok=True)
+    fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name_part + (f".gunzip" if gunzip else ""))
     
     if not fp.is_file() or not allow_caching:
         # Create directory if needed
