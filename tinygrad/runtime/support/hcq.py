@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import cast, Type, TypeVar, Generic, Any
-import contextlib, decimal, statistics, time, ctypes, array, os, fcntl
-from tinygrad.helpers import PROFILE, from_mv, getenv, to_mv, round_up
+import contextlib, decimal, statistics, time, ctypes, array, os
+from tinygrad.helpers import PROFILE, from_mv, getenv, to_mv, round_up, WIN
 from tinygrad.renderer import Renderer
 from tinygrad.device import BufferSpec, Compiler, Compiled, LRUAllocator, ProfileRangeEvent, ProfileDeviceEvent
 from tinygrad.ops import sym_infer, sint, Variable
@@ -13,6 +13,7 @@ class HWInterface:
   """
 
   def __init__(self, path:str="", flags:int=os.O_RDONLY, fd:int|None=None):
+    if not WIN: import fcntl
     self.path:str = path
     self.fd:int = fd or os.open(path, flags)
   def __del__(self):
