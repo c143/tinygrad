@@ -233,15 +233,15 @@ def _file_lock(filepath: Path, timeout: float = 5.0):
   lockfile = filepath.with_suffix('.lock')
   end_time = time.time() + timeout
   while True:
+    if time.time() > end_time: raise TimeoutError(f"Could not acquire lock on {filepath} within {timeout} seconds.")
     try:
       fd = os.open(lockfile, os.O_CREAT | os.O_EXCL | os.O_RDWR)
       yield fd
       break
     except FileExistsError:
-      if time.time() > end_time: raise TimeoutError(f"Could not acquire lock on {filepath} within {timeout} seconds.")
       time.sleep(0.1)
     finally:
-      if 'fd' in locals():
+      if fd is not None:
         os.close(fd)
         os.remove(lockfile)
 
