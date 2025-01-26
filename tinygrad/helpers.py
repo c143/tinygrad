@@ -3,7 +3,7 @@ import os, functools, platform, time, re, contextlib, operator, hashlib, pickle,
 import urllib.request, subprocess, shutil, math, contextvars, types, copyreg, inspect, importlib
 from dataclasses import dataclass
 from typing import Union, ClassVar, Optional, Iterable, Any, TypeVar, Callable, Sequence, TypeGuard, Iterator, Generic
-import threading
+#import threading
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -244,7 +244,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
   if url.startswith(("/", ".")): return pathlib.Path(url)
   if name is not None and (isinstance(name, pathlib.Path) or '/' in name): fp = pathlib.Path(name)
   else: fp = _ensure_downloads_dir() / (subdir or "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
-  if not fp.is_file() or not allow_caching:
+  if not fp.exists() or not allow_caching:
     print("a")
     print(fp.resolve())
     print(not fp.is_file())
@@ -256,10 +256,10 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
       readfile = gzip.GzipFile(fileobj=r) if gunzip else r
       progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
-      lock = threading.Lock()
-      with lock:
-        with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
-          while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
+      #lock = threading.Lock()
+      #with lock:
+      with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
+        while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
         pathlib.Path(f.name).replace(fp)
       progress_bar.update(close=True)
       if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
