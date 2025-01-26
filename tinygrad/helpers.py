@@ -279,7 +279,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
           print("not exists")
           print(fp.resolve())
           print(f.name)
-        pathlib.Path(f.name).rename(fp)
+        pathlib.Path(f.name).replace(fp)
       progress_bar.update(close=True) # TODO: only place here if above return is removed
       if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
   return fp
