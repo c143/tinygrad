@@ -46,7 +46,7 @@ jobs:
           path: C:\Users\runneradmin\AppData\Local\Temp\chocolatey\
           key: choco-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
       - name: Set env
-        run: if ('${{ matrix.backend }}' -eq 'clang') { $env:CLANG=1 } elseif ('${{ matrix.backend }}' -eq 'gpu') { $env:GPU=1} elseif ('${{ matrix.backend }}' -eq 'llvm') { $env:LLVM=1 } elseif ('${{ matrix.backend }}' -eq 'adm') { $env:AMD=1;$env:MOCKGPU=1;$env:FORWARD_ONLY=1 }
+        run: if ('${{ matrix.backend }}' -eq 'clang') { echo "CLANG=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'gpu') { echo "GPU=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'llvm') { echo "LLVM=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'adm') { echo "AMD=1\nMOCKGPU=1\nFORWARD_ONLY=1" >> $env:GITHUB_ENV }
       - name: Install OpenCL
         if: matrix.backend == 'gpu'
         run: choco install opencl-intel-cpu-runtime --version '16.1.1'
