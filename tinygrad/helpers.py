@@ -166,7 +166,7 @@ class Profiling(contextlib.ContextDecorator):
 
 # *** universal database cache ***
 
-cache_dir: str = os.path.join(getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
+cache_dir: str = getenv("TEMP") if WIN else os.path.join(getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
 CACHEDB: str = getenv("CACHEDB", os.path.abspath(os.path.join(cache_dir, "cache.db")))
 
 VERSION = 17
@@ -258,6 +258,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       print(_dir)
       with filepath.open("w", encoding ="utf-8") as ffff:
           ffff.write("abcdefghijklmop")
+    fp.unlink()
     with urllib.request.urlopen(url, timeout=10) as r:
       assert r.status == 200, r.status
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
