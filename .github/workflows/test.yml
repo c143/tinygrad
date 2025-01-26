@@ -35,11 +35,11 @@ jobs:
         with:
           path: ${{ env.Python3_ROOT_DIR }}\Lib\site-packages
           key: windows-${{ matrix.backend }}-packages-${{ hashFiles('**/setup.py') }}
-      - name: Cache downloads
-        uses: actions/cache@v4
-        with:
-          path: C:\Users\runneradmin\.cache\tinygrad\downloads\
-          key: downloads-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
+      #- name: Cache downloads
+      #  uses: actions/cache@v4
+      #  with:
+      #    path: C:\Users\runneradmin\.cache\tinygrad\downloads\
+      #    key: downloads-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
       - name: Cache choco
         uses: actions/cache@v4
         with:
@@ -58,8 +58,8 @@ jobs:
           $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
       - name: Run pytest (not cuda or amd)
         if: matrix.backend!='ptx' && matrix.backend!='triton' && matrix.backend != 'amd' && matrix.backend != 'nv'
-        #run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
-        run: python -m pytest -n=auto test/models/test_mnist.py --ignore=test/unit --durations=20
+        run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
+        #run: python -m pytest -n=auto test/models/test_mnist.py --ignore=test/unit --durations=20
       #- name: Run ONNX (only LLVM)
       #  if: matrix.backend == 'llvm'
       #  run: python -m pytest -n=auto test/external/external_test_onnx_backend.py --durations=20
