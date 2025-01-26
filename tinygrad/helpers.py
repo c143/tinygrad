@@ -270,6 +270,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
       with tempfile.NamedTemporaryFile(dir=_dir, delete=False, delete_on_close=False) as f:
         while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
+        f.flush()
         f.close()
         #if fp.is_file():
         #  print("exists")
