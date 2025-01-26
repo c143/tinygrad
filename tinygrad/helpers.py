@@ -271,7 +271,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
         f.flush()
         f.close()
         progress_bar.update(close=True)
-        if fp.is_file(): return fp # TODO: file lock instead
+        #if fp.is_file(): return fp # TODO: file lock instead
         pathlib.Path(f.name).replace(fp)
       if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
     return fp
