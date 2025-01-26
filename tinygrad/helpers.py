@@ -228,7 +228,8 @@ CAPTURE_PROCESS_REPLAY = getenv("RUN_PROCESS_REPLAY") or getenv("CAPTURE_PROCESS
 # *** http support ***
 
 def _ensure_downloads_dir() -> pathlib.Path:
-  return pathlib.Path(cache_dir) / "downloads"
+  (downloads_dir := pathlib.Path(cache_dir) / "downloads").mkdir(parents=True, exist_ok=True)
+  return downloads_dir
 
 def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional[str]=None, gunzip:bool=False,
           allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
@@ -237,7 +238,6 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
   else: fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else "")))
   if not fp.is_file() or not allow_caching:
     (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
-    if fp.is_file(): fp.unlink()
     with urllib.request.urlopen(url, timeout=10) as r:
       assert r.status == 200, r.status
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
