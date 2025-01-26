@@ -3,7 +3,6 @@ import os, functools, platform, time, re, contextlib, operator, hashlib, pickle,
 import urllib.request, subprocess, shutil, math, contextvars, types, copyreg, inspect, importlib
 from dataclasses import dataclass
 from typing import Union, ClassVar, Optional, Iterable, Any, TypeVar, Callable, Sequence, TypeGuard, Iterator, Generic
-from contextlib import contextmanager
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -229,10 +228,9 @@ CAPTURE_PROCESS_REPLAY = getenv("RUN_PROCESS_REPLAY") or getenv("CAPTURE_PROCESS
 # *** http support ***
 
 @contextmanager
-def _file_lock(filepath: Path, timeout: float = 5.0):
+def _file_lock(filepath: Path):
   lockfile = filepath.with_suffix('.lock')
-  end_time = time.time() + timeout
-  while time.time() < end_time:
+  while True:
     try:
       fd = os.open(lockfile, os.O_CREAT | os.O_EXCL | os.O_RDWR)
       yield fd
@@ -240,6 +238,7 @@ def _file_lock(filepath: Path, timeout: float = 5.0):
       os.close(fd)
       os.remove(lockfile)
     break
+    time.sleep(0.1)
 
 def _ensure_downloads_dir() -> pathlib.Path:
   # if we are on a tinybox, use the raid array
