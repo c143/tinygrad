@@ -8,11 +8,12 @@ from extra.gradcheck import numerical_jacobian, jacobian, gradcheck
 from hypothesis import given, settings, strategies as strat
 from tinygrad.device import is_dtype_supported
 from tinygrad.ops import Ops, UOp
-from tinygrad.runtime.support.compiler_cuda import PTX
 from tinygrad.codegen.linearize import linearize_uop
 from tinygrad.codegen.rewriter import full_graph_rewrite
 from tinygrad.codegen.lowerer import rewrite_shapetracker_with_index
 from tinygrad.dtype import DType
+
+PTX = getenv("PTX")  # this shouldn't be here, in fact, it shouldn't exist
 
 settings.register_profile("my_profile", max_examples=200, deadline=None, derandomize=getenv("DERANDOMIZE_CI", False))
 settings.load_profile("my_profile")

@@ -45,23 +45,21 @@ jobs:
         with:
           path: C:\ProgramData\chocolatey\lib\opencl-intel-cpu-runtime
           key: opencl-cache-windows-${{ matrix.backend }}
-      - name: Cache CUDA
-        uses: actions/cache@v4
-        with:
-          path: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8
-          key: cuda-cache-windows-${{ matrix.backend }}
+      #- name: Cache CUDA
+      #  uses: actions/cache@v4
+      #  with:
+      #    path: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8
+      #    key: cuda-cache-windows-${{ matrix.backend }}
       - name: Set env
         run: if ('${{ matrix.backend }}' -eq 'clang') { echo "CLANG=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'gpu') { echo "GPU=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'llvm') { echo "LLVM=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'adm') { echo "AMD=1\nMOCKGPU=1\nFORWARD_ONLY=1" >> $env:GITHUB_ENV }
       - name: Install OpenCL
         if: matrix.backend == 'gpu'
-        run: | # TODO: remove log
-          choco install opencl-intel-cpu-runtime --version '16.1.1'
-          echo (Get-Content "C:\ProgramData\chocolatey\logs\chocolatey.log")
-      - name: Install CUDA
-        run: | # TODO: remove log
-          choco install cuda --version='12.8.0.571' --no-progress
-          echo (Get-Content "C:\ProgramData\chocolatey\logs\chocolatey.log")
-          nvcc --version
+        run: choco install opencl-intel-cpu-runtime --version '16.1.1'
+      #- name: Install CUDA
+      #  run: | # TODO: remove log
+      #    choco install cuda --version='12.8.0.571' --no-progress
+      #    echo (Get-Content "C:\ProgramData\chocolatey\logs\chocolatey.log")
+      #    nvcc --version
       - name: Install dependencies
         run: pip install -e ".[testing$(if ('${{ matrix.backend }}' -eq 'llvm') {',llvm'})]" --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
       - name: Check Device.DEFAULT and print some source
