@@ -276,15 +276,9 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
         while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
         f.flush()
         f.close()
-        if fp.is_file():
-          print("exists")
-          return fp
-        else:
-          print("not exists")
-          print(fp.resolve())
-          print(f.name)
+        progress_bar.update(close=True)
+        if fp.is_file(): return fp
         pathlib.Path(f.name).replace(fp)
-      progress_bar.update(close=True) # TODO: only place here if above return is removed
       if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
   return fp
 
