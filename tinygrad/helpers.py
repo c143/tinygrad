@@ -228,21 +228,13 @@ CAPTURE_PROCESS_REPLAY = getenv("RUN_PROCESS_REPLAY") or getenv("CAPTURE_PROCESS
 # *** http support ***
 
 def _ensure_downloads_dir() -> pathlib.Path:
-  # if we are on a tinybox, use the raid array
-  if pathlib.Path("/etc/tinybox-release").is_file():
-    # try creating dir with sudo
-    if not (downloads_dir := pathlib.Path("/raid/downloads")).exists():
-      subprocess.run(["sudo", "mkdir", "-p", downloads_dir], check=True)
-      subprocess.run(["sudo", "chown", "tiny:root", downloads_dir], check=True)
-      subprocess.run(["sudo", "chmod", "775", downloads_dir], check=True)
-    return downloads_dir
   return pathlib.Path(cache_dir) / "downloads"
 
 def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional[str]=None, gunzip:bool=False,
           allow_caching=not getenv("DISABLE_HTTP_CACHE")) -> pathlib.Path:
   if url.startswith(("/", ".")): return pathlib.Path(url)
   if name is not None and (isinstance(name, pathlib.Path) or '/' in name): fp = pathlib.Path(name)
-  else: fp = (_ensure_downloads_dir() / (subdir if subdir is not None else "") / name or hashlib.md5(url.encode('utf-8')).hexdigest() + (".gunzip" if gunzip else ""))
+  else: fp = (_ensure_downloads_dir() / (subdir or "") / (name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
   if not fp.is_file() or not allow_caching:
     (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
     #if fp.is_file(): fp.unlink()
