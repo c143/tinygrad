@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: C:\Users\runneradmin\AppData\Local\Temp\chocolatey\
-          key: downloads-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
+          key: choco-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
       - name: Set env
         run: if ('${{ matrix.backend }}' -eq 'clang') { echo "CLANG=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'gpu') { echo "GPU=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'llvm') { echo "LLVM=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'adm') { echo "AMD=1\nMOCKGPU=1\nFORWARD_ONLY=1" >> $env:GITHUB_ENV }
       - name: Install OpenCL
