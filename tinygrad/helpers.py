@@ -274,9 +274,9 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
         else:
           print("not exists")
           print(fp.resolve())
-          print(f.resolve())
+          print(f.name)
           pathlib.Path(f.name).rename(fp)
-      if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
+      if length and (file_size:=os.stat(fp).st_size) != length: raise RuntimeError(f"fetch size differs, {file_size} != {length}")
   return fp
 
 # *** Exec helpers
