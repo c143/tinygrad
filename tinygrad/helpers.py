@@ -3,6 +3,7 @@ import os, functools, platform, time, re, contextlib, operator, hashlib, pickle,
 import urllib.request, subprocess, shutil, math, contextvars, types, copyreg, inspect, importlib
 from dataclasses import dataclass
 from typing import Union, ClassVar, Optional, Iterable, Any, TypeVar, Callable, Sequence, TypeGuard, Iterator, Generic
+from filelock import FileLock
 #import threading
 
 T = TypeVar("T")
@@ -244,29 +245,10 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
   if url.startswith(("/", ".")): return pathlib.Path(url)
   if name is not None and (isinstance(name, pathlib.Path) or '/' in name): fp = pathlib.Path(name)
   else: fp = _ensure_downloads_dir() / (subdir if subdir is not None else "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
-  if not fp.is_file() or not allow_caching:
+  if fp.is_file() and allow_caching: return fp
+  lock_file = str(fp) + '.lock'
+  with FileLock(lock_file):
     (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
-    #print("allow caching")
-    #print(allow_caching)
-    #print(getenv("DISABLE_HTTP_CACHE"))
-    #print(_dir)
-    #print("is dir")
-    #print(_dir.is_dir())
-    #filepath = _dir / "test.txt"
-    #if filepath.is_file():
-    #  print("is file")
-    #  filepath.unlink()
-    #print("write test.txt")
-    #print(_dir)
-    #with filepath.open("w", encoding ="utf-8") as ffff:
-    #    ffff.write("abcdefghijklmop")
-    print("bcb")
-    print(getenv("GPU"))
-    print("bcb")
-    print(not getenv("DISABLE_HTTP_CACHE"))
-    print(allow_caching)
-    print(getenv("DISABLE_HTTP_CACHE"))
-    print("ccc")
     with urllib.request.urlopen(url, timeout=10) as r:
       assert r.status == 200, r.status
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
@@ -277,7 +259,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
         f.flush()
         f.close()
         progress_bar.update(close=True)
-        if fp.is_file(): return fp
+        #if fp.is_file(): return fp
         pathlib.Path(f.name).replace(fp)
       if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
   return fp
