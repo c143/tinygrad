@@ -35,11 +35,11 @@ jobs:
         with:
           path: ${{ env.Python3_ROOT_DIR }}\Lib\site-packages
           key: windows-${{ matrix.backend }}-packages-${{ hashFiles('**/setup.py') }}
-      #- name: Cache downloads
-      #  uses: actions/cache@v4
-      #  with:
-      #    path: C:\Users\runneradmin\.cache\tinygrad\downloads\
-      #    key: downloads-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
+      - name: Cache downloads
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\.cache\tinygrad\downloads\
+          key: downloads-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
       - name: Cache choco
         uses: actions/cache@v4
         with:
@@ -52,10 +52,10 @@ jobs:
         run: choco install opencl-intel-cpu-runtime --version '16.1.1'
       - name: Install dependencies
         run: pip install -e ".[testing$(if ('${{ matrix.backend }}' -eq 'llvm') {',llvm'})]" --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
-      #- name: Check Device.DEFAULT and print some source
-      #  run: |
-      #    $env:PYTHONPATH = "${{ github.workspace }}"; python -c "from tinygrad import Device; assert Device.DEFAULT in ['LLVM','CLANG','CUDA','GPU','AMD','NV'], Device.DEFAULT"
-      #    $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
+      - name: Check Device.DEFAULT and print some source
+        run: |
+          $env:PYTHONPATH = "${{ github.workspace }}"; python -c "from tinygrad import Device; assert Device.DEFAULT in ['LLVM','CLANG','CUDA','GPU','AMD','NV'], Device.DEFAULT"
+          $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
       - name: Run pytest (not cuda or amd)
         if: matrix.backend!='ptx' && matrix.backend!='triton' && matrix.backend != 'amd' && matrix.backend != 'nv'
         #run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
