@@ -164,8 +164,8 @@ class Profiling(contextlib.ContextDecorator):
 
 # *** universal database cache ***
 
-cache_dir: str = os.path.join(getenv("XDG_CACHE_HOME", os.path.expanduser("~/Library/Caches" if OSX else "~/.cache")), "tinygrad")
-CACHEDB: str = getenv("CACHEDB", os.path.abspath(os.path.join(cache_dir, "cache.db")))
+cache_dir: str = pathlib.Path(getenv("XDG_CACHE_HOME", pathlib.Path.expanduser("~/Library/Caches" if OSX else "~/.cache")) / "tinygrad")
+CACHEDB: str = getenv("CACHEDB", pathlib.Path(cache_dir / "cache.db").resolve())
 CACHELEVEL = getenv("CACHELEVEL", 2)
 
 VERSION = 17
@@ -254,7 +254,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
         while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
       fp = pathlib.Path(f.name).replace(fp)
-      if length and (file_size:=os.path.getsize(fp)) < length: raise RuntimeError(f"fetch size incomplete: {file_size} < {length}")
+      if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete: {file_size} < {length}")
   return fp
 
 # *** Exec helpers

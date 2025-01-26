@@ -57,3 +57,9 @@ jobs:
         run: |
           $env:PYTHONPATH = "${{ github.workspace }}"; python -c "from tinygrad import Device; assert Device.DEFAULT in ['LLVM','CLANG','CUDA','GPU','AMD','NV'], Device.DEFAULT"
           $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
+      - name: Run pytest (not cuda or amd)
+        if: matrix.backend!='ptx' && matrix.backend!='triton' && matrix.backend != 'amd' && matrix.backend != 'nv'
+        run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
+      - name: Run ONNX (only LLVM)
+        if: matrix.backend == 'llvm'
+        run: python -m pytest -n=auto test/external/external_test_onnx_backend.py --durations=20
