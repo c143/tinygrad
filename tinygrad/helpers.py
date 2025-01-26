@@ -227,6 +227,7 @@ CAPTURE_PROCESS_REPLAY = getenv("RUN_PROCESS_REPLAY") or getenv("CAPTURE_PROCESS
 
 # *** http support ***
 
+@contextmanager
 def _file_lock(filepath: Path):
   lockfile = filepath.with_suffix('.lock')  # Create a lock file path
   while True:
