@@ -246,18 +246,18 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
   else: fp = _ensure_downloads_dir() / (subdir if subdir is not None else "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
   if not fp.is_file() or not allow_caching:
     (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
-    print("allow caching")
-    print(allow_caching)
-    print(getenv("DISABLE_HTTP_CACHE"))
-    print(_dir)
-    print("is dir")
-    print(_dir.is_dir())
-    filepath = _dir / "test.txt"
-    if filepath.is_file():
-      print("is file")
-      filepath.unlink()
-    print("write test.txt")
-    print(_dir)
+    #print("allow caching")
+    #print(allow_caching)
+    #print(getenv("DISABLE_HTTP_CACHE"))
+    #print(_dir)
+    #print("is dir")
+    #print(_dir.is_dir())
+    #filepath = _dir / "test.txt"
+    #if filepath.is_file():
+    #  print("is file")
+    #  filepath.unlink()
+    #print("write test.txt")
+    #print(_dir)
     with filepath.open("w", encoding ="utf-8") as ffff:
         ffff.write("abcdefghijklmop")
     with urllib.request.urlopen(url, timeout=10) as r:
@@ -268,7 +268,6 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
         while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
         f.close()
-        progress_bar.update(close=True)
         if fp.is_file():
           return fp
         else:
@@ -276,7 +275,8 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
           print(fp.resolve())
           print(f.name)
           pathlib.Path(f.name).rename(fp)
-      if length and (file_size:=os.stat(fp).st_size) != length: raise RuntimeError(f"fetch size differs, {file_size} != {length}")
+      progress_bar.update(close=True) # TODO: only place here if above return is removed
+      if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
   return fp
 
 # *** Exec helpers
