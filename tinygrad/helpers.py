@@ -253,12 +253,12 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
     print("a")
     (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
     filepath = _dir / "test.txt"
-    if not filepath.exists:
-      print("write test.txt")
-      print(_dir)
-      with filepath.open("w", encoding ="utf-8") as ffff:
-          ffff.write("abcdefghijklmop")
-    fp.unlink()
+    if filepath.exists:
+      filepath.unlink()
+    print("write test.txt")
+    print(_dir)
+    with filepath.open("w", encoding ="utf-8") as ffff:
+        ffff.write("abcdefghijklmop")
     with urllib.request.urlopen(url, timeout=10) as r:
       assert r.status == 200, r.status
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
