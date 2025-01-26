@@ -263,6 +263,10 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
     print("bcb")
     print(getenv("GPU"))
     print("bcb")
+    print(not getenv("DISABLE_HTTP_CACHE"))
+    print(allow_caching)
+    print(getenv("DISABLE_HTTP_CACHE"))
+    print("ccc")
     with urllib.request.urlopen(url, timeout=10) as r:
       assert r.status == 200, r.status
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
