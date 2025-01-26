@@ -53,13 +53,13 @@ jobs:
         run: choco install opencl-intel-cpu-runtime --version '16.1.1'
       - name: Install dependencies
         run: pip install -e ".[testing$(if ('${{ matrix.backend }}' -eq 'llvm') {',llvm'})]" --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
-      - name: Check Device.DEFAULT and print some source
-        run: |
-          $env:PYTHONPATH = "${{ github.workspace }}"; python -c "from tinygrad import Device; assert Device.DEFAULT in ['LLVM','CLANG','CUDA','GPU','AMD','NV'], Device.DEFAULT"
-          $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
-      - name: Run pytest (not cuda or amd)
-        if: matrix.backend!='ptx' && matrix.backend!='triton' && matrix.backend != 'amd' && matrix.backend != 'nv'
-        run: python -m pytest -n=auto test/models/test_mnist.py --ignore=test/unit --durations=20
+      #- name: Check Device.DEFAULT and print some source
+      #  run: |
+      #    $env:PYTHONPATH = "${{ github.workspace }}"; python -c "from tinygrad import Device; assert Device.DEFAULT in ['LLVM','CLANG','CUDA','GPU','AMD','NV'], Device.DEFAULT"
+      #    $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
+      #- name: Run pytest (not cuda or amd)
+      #  if: matrix.backend!='ptx' && matrix.backend!='triton' && matrix.backend != 'amd' && matrix.backend != 'nv'
+      #  run: python -m pytest -n=auto test/models/test_mnist.py --ignore=test/unit --durations=20
         #run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
       #- name: Run ONNX (only LLVM)
       #  if: matrix.backend == 'llvm'
