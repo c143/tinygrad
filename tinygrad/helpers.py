@@ -3,6 +3,7 @@ import os, functools, platform, time, re, contextlib, operator, hashlib, pickle,
 import urllib.request, subprocess, shutil, math, contextvars, types, copyreg, inspect, importlib
 from dataclasses import dataclass
 from typing import Union, ClassVar, Optional, Iterable, Any, TypeVar, Callable, Sequence, TypeGuard, Iterator, Generic
+import threading
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -255,7 +256,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
       readfile = gzip.GzipFile(fileobj=r) if gunzip else r
       progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
-      lock = threading.threading.Lock()
+      lock = threading.Lock()
       with lock:
         with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
           while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
