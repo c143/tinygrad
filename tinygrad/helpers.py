@@ -241,7 +241,7 @@ def _file_lock(filepath: Path, timeout: float = 5.0):
     except FileExistsError:
       time.sleep(0.1)
     finally:
-      if fd is not None:
+      if 'fd' in locals():
         os.close(fd)
         os.remove(lockfile)
 
