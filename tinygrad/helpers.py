@@ -3,8 +3,6 @@ import os, functools, platform, time, re, contextlib, operator, hashlib, pickle,
 import urllib.request, subprocess, shutil, math, contextvars, types, copyreg, inspect, importlib
 from dataclasses import dataclass
 from typing import Union, ClassVar, Optional, Iterable, Any, TypeVar, Callable, Sequence, TypeGuard, Iterator, Generic
-from filelock import FileLock
-#import threading
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -247,21 +245,20 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
   else: fp = _ensure_downloads_dir() / (subdir if subdir is not None else "") / ((name or hashlib.md5(url.encode('utf-8')).hexdigest()) + (".gunzip" if gunzip else ""))
   if fp.is_file() and allow_caching: return fp
   lock_file = str(fp) + '.lock'
-  with FileLock(lock_file):
-    (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(url, timeout=10) as r:
-      assert r.status == 200, r.status
-      length = int(r.headers.get('content-length', 0)) if not gunzip else None
-      readfile = gzip.GzipFile(fileobj=r) if gunzip else r
-      progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
-      with tempfile.NamedTemporaryFile(dir=_dir, delete=False, delete_on_close=False) as f:
-        while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
-        f.flush()
-        f.close()
-        progress_bar.update(close=True)
-        #if fp.is_file(): return fp
-        pathlib.Path(f.name).replace(fp)
-      if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
+  (_dir := fp.parent).mkdir(parents=True, exist_ok=True)
+  with urllib.request.urlopen(url, timeout=10) as r:
+    assert r.status == 200, r.status
+    length = int(r.headers.get('content-length', 0)) if not gunzip else None
+    readfile = gzip.GzipFile(fileobj=r) if gunzip else r
+    progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
+    with tempfile.NamedTemporaryFile(dir=_dir, delete=False, delete_on_close=False) as f:
+      while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
+      f.flush()
+      f.close()
+      progress_bar.update(close=True)
+      if fp.is_file(): return fp # TODO: file lock instead
+      pathlib.Path(f.name).replace(fp)
+    if length and (file_size:=os.stat(fp).st_size) < length: raise RuntimeError(f"fetch size incomplete, {file_size} < {length}")
   return fp
 
 # *** Exec helpers
