@@ -255,6 +255,7 @@ def fetch(url:str, name:Optional[Union[pathlib.Path, str]]=None, subdir:Optional
       length = int(r.headers.get('content-length', 0)) if not gunzip else None
       readfile = gzip.GzipFile(fileobj=r) if gunzip else r
       progress_bar:tqdm = tqdm(total=length, unit='B', unit_scale=True, desc=f"{url}", disable=CI)
+      lock = threading.threading.Lock()
       with lock:
         with tempfile.NamedTemporaryFile(dir=_dir, delete=False) as f:
           while chunk := readfile.read(16384): progress_bar.update(f.write(chunk))
