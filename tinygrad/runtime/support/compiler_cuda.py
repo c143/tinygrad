@@ -1,8 +1,8 @@
 import subprocess, hashlib, tempfile, ctypes, ctypes.util, re, pathlib
 from typing import Callable
-from tinygrad.helpers import to_char_p_p, colored, init_c_var, getenv, WIN
+from tinygrad.helpers import to_char_p_p, colored, init_c_var, getenv
+import tinygrad.runtime.autogen.nvrtc as nvrtc
 from tinygrad.device import Compiler, CompileError
-if WIN: import tinygrad.runtime.autogen.nvrtc as nvrtc
 
 PTX = getenv("PTX")  # this shouldn't be here, in fact, it shouldn't exist
 
