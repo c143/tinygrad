@@ -40,11 +40,11 @@ jobs:
       #  with:
       #    path: C:\Users\runneradmin\.cache\tinygrad\downloads\*
       #    key: downloads-cache-windows-${{ matrix.backend }}-${{ env.DOWNLOAD_CACHE_VERSION }}
-      - name: Cache OpenCL
-        uses: actions/cache@v4
-        with:
-          path: C:\ProgramData\chocolatey\lib\opencl-intel-cpu-runtime
-          key: opencl-cache-windows-${{ matrix.backend }}
+      #- name: Cache OpenCL
+      #  uses: actions/cache@v4
+      #  with:
+      #    path: C:\ProgramData\chocolatey\lib\opencl-intel-cpu-runtime
+      #x    key: opencl-cache-windows-${{ matrix.backend }}
       #- name: Cache CUDA
       #  uses: actions/cache@v4
       #  with:
