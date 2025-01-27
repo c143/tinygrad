@@ -54,7 +54,9 @@ jobs:
         run: if ('${{ matrix.backend }}' -eq 'clang') { echo "CLANG=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'gpu') { echo "GPU=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'llvm') { echo "LLVM=1" >> $env:GITHUB_ENV } elseif ('${{ matrix.backend }}' -eq 'adm') { echo "AMD=1\nMOCKGPU=1\nFORWARD_ONLY=1" >> $env:GITHUB_ENV }
       - name: Install OpenCL
         if: matrix.backend == 'gpu'
-        run: choco install opencl-intel-cpu-runtime --version '16.1.1'
+        run: | # TODO: remove clang --print-available-targets
+          choco install opencl-intel-cpu-runtime --version '16.1.1'
+          clang --print-available-targets
       #- name: Install CUDA
       #  run: choco install cuda --version='12.8.0.571' --no-progress
       - name: Install dependencies
