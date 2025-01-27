@@ -9,7 +9,7 @@ class TestElfLoader(unittest.TestCase):
         relocation(x+1);
       }
     '''
-    args = ('-x', 'c', '-c', '-target', f'x84_64-none-unknown-elf', '-march=x86-64', '-fPIC', '-O2', '-ffreestanding', '-nostdlib')
+    args = ('-x', 'c', '-c', '-target', f'aarch64-none-unknown-elf', '-march=armv8-a', '-fPIC', '-O2', '-ffreestanding', '-nostdlib')
     obj = subprocess.check_output(('clang',) + args + ('-', '-o', '-'), input=src.encode('utf-8'))
     _, sections, _ = elf_loader(obj)
     section_names = [sh.name for sh in sections]
