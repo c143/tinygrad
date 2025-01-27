@@ -13,8 +13,6 @@ from tinygrad.codegen.rewriter import full_graph_rewrite
 from tinygrad.codegen.lowerer import rewrite_shapetracker_with_index
 from tinygrad.dtype import DType
 
-PTX = getenv("PTX")  # this shouldn't be here, in fact, it shouldn't exist
-
 settings.register_profile("my_profile", max_examples=200, deadline=None, derandomize=getenv("DERANDOMIZE_CI", False))
 settings.load_profile("my_profile")
 
@@ -831,7 +829,7 @@ class TestIdxUpcast(unittest.TestCase):
   def test_regular_sym(self):
     self.do_op_then_assert(dtypes.int, 2048, 2048, UOp.variable("dim3", 0, 64).bind(32))
 
-  @unittest.skipIf(PTX, "PTX always convert Ops.INDEX to int64")
+  @unittest.skipIf(getenv("PTX"), "PTX always convert Ops.INDEX to int64")
   def test_symfold(self):
     # This would cause an overflow, but after sym fold it's within int32
     a = Tensor.arange(65535)

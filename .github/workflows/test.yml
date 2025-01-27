@@ -56,10 +56,7 @@ jobs:
         if: matrix.backend == 'gpu'
         run: choco install opencl-intel-cpu-runtime --version '16.1.1'
       #- name: Install CUDA
-      #  run: | # TODO: remove log
-      #    choco install cuda --version='12.8.0.571' --no-progress
-      #    echo (Get-Content "C:\ProgramData\chocolatey\logs\chocolatey.log")
-      #    nvcc --version
+      #  run: choco install cuda --version='12.8.0.571' --no-progress
       - name: Install dependencies
         run: pip install -e ".[testing$(if ('${{ matrix.backend }}' -eq 'llvm') {',llvm'})]" --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
       - name: Check Device.DEFAULT and print some source
