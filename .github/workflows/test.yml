@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        backend: [gpu] #, clang] #, amd]
+        backend: [llvm] #gpu] #, clang] #, amd]
     name: Tests on Windows (${{ matrix.backend }})
     runs-on: windows-2022
     timeout-minutes: 45
@@ -65,8 +65,7 @@ jobs:
           $env:PYTHONPATH = "${{ github.workspace }}"; $env:DEBUG = "5"; $env:FORWARD_ONLY = "1"; python test/test_ops.py TestOps.test_add
       - name: Run pytest (not cuda or amd)
         if: matrix.backend!='ptx' && matrix.backend!='triton' && matrix.backend != 'amd' && matrix.backend != 'nv'
-        #run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
-        run: python -m pytest -n=auto test/test_elf.py --ignore=test/unit --durations=20
+        run: python -m pytest -n=auto test/ --ignore=test/unit --durations=20
       #  run: |
       #    python -m pytest -n=auto test/test_hcq.py --ignore=test/unit --durations=20
       #    python -m pytest -n=auto test/test_profiler.py --ignore=test/unit --durations=20
